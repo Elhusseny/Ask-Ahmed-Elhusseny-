@@ -1,35 +1,88 @@
-from flask import Flask, request, jsonify
-import pandas as pd
-import difflib
-import os
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>اسأل أحمد الحسيني</title>
+  <style>
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background-color: #f1f5f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px;
+    }
+    .avatar {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      margin-bottom: 20px;
+    }
+    h1 {
+      color: #1e293b;
+    }
+    .chat-box {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+      padding: 20px;
+      margin-top: 20px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: 2px solid #94a3b8;
+      border-radius: 8px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    audio {
+      margin-top: 20px;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <img src="avatar.png" alt="Avatar" class="avatar" />
+  <h1>اسأل أحمد الحسيني</h1>
 
-app = Flask(__name__)
+  <div class="chat-box">
+    <input type="text" id="questionInput" placeholder="اكتب سؤالك هنا" />
+    <button onclick="playAnswer()">اسأل</button>
+    <audio id="audioPlayer" controls></audio>
+  </div>
 
-# تحميل بيانات الأسئلة والإجابات
-df = pd.read_csv('أسئلة_مقترحة_لأحمد_الحسيني.csv')
+  <script>
+    function normalize(text) {
+      return text
+        .trim()
+        .replace(/[؟?!.،]/g, '')
+        .replace(/\s+/g, '_')
+        .toLowerCase();
+    }
 
-# تحويل العمودين لقوائم
-questions = df['question'].tolist()
-answers = df['answer'].tolist()
-audio_paths = df['audio_path'].tolist()
-
-def find_best_match(user_input):
-    matches = difflib.get_close_matches(user_input, questions, n=1, cutoff=0.6)
-    if matches:
-        idx = questions.index(matches[0])
-        return {
-            'question': questions[idx],
-            'answer': answers[idx],
-            'audio': audio_paths[idx]
-        }
-    else:
-        return {
-            'question': None,
-            'answer': "معرفش أرد على السؤال ده دلوقتي، جرب تسألني بشكل تاني 😊",
-            'audio': None
-        }
-
-@app.route('/ask', methods=['POST'])
-def ask():
-    data = request.get_json()
-    user_input = data.get('question', '')
+    function playAnswer() {
+      const input = document.getElementById('questionInput').value;
+      const fileName = normalize(input);
+      const audio = document.getElementById('audioPlayer');
+      audio.src = `audio/${fileName}.mp3`;
+      audio.play().catch(() => {
+        alert('الصوت غير متوفر لهذا السؤال.');
+      });
+    }
+  </script>
+</body>
+</html>
